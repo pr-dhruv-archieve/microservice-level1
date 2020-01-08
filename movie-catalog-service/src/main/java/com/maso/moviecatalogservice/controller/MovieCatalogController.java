@@ -3,6 +3,7 @@ package com.maso.moviecatalogservice.controller;
 import com.maso.moviecatalogservice.model.CatalogItem;
 import com.maso.moviecatalogservice.model.Movie;
 import com.maso.moviecatalogservice.model.Rating;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,11 +17,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/catalog")
 public class MovieCatalogController {
 
+    @Autowired
+    private RestTemplate restTemplate;
+
     // Get all rated movieId
     @RequestMapping("/{movieId}")
     public List<CatalogItem> getMovieById(@PathVariable("movieId") String movieId) {
 
-        RestTemplate restTemplate = new RestTemplate();
         // Step 1 : Get all rated movie data
         List<Rating> movieRatings = Arrays.asList(new Rating("1", 4.5), new Rating("2", 8.9));
 
@@ -30,7 +33,7 @@ public class MovieCatalogController {
                 rating -> {
                         // Making synchronous call to movie-info-service microservice
                         Movie movie = restTemplate.getForObject("http://localhost:8082/movies/" + rating.getMovieId()  , Movie.class);
-                        return new CatalogItem(rating.getMovieId(), movie.getMovieName(), "Movie id " + movieId + " desc", rating.getRating());
+                        return new CatalogItem(rating.getMovieId(), movie.getMovieName(), "Movie id " + rating.getMovieId() + " desc", rating.getRating());
                 }
         ).collect(Collectors.toList());
 
