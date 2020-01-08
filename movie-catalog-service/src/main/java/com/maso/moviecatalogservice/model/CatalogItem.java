@@ -2,6 +2,7 @@ package com.maso.moviecatalogservice.model;
 
 public class CatalogItem {
 
+    private String movieId;
     private String movieName;
     private String movieDescription;
     private double movieRating;
@@ -10,10 +11,19 @@ public class CatalogItem {
         super();
     }
 
-    public CatalogItem(String movieName, String movieDescription, double movieRating) {
+    public CatalogItem(String movieId, String movieName, String movieDescription, double movieRating) {
+        this.movieId = movieId;
         this.movieName = movieName;
         this.movieDescription = movieDescription;
         this.movieRating = movieRating;
+    }
+
+    public String getMovieId() {
+        return movieId;
+    }
+
+    public void setMovieId(String movieId) {
+        this.movieId = movieId;
     }
 
     public String getMovieName() {
