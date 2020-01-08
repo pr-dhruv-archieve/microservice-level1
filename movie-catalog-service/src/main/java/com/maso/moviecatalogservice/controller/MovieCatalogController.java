@@ -12,9 +12,16 @@ import java.util.List;
 @RequestMapping("/catalog")
 public class MovieCatalogController {
 
+    // Get all rated movieId
     @RequestMapping("/{movieId}")
     public List<CatalogItem> getMovieById(@PathVariable("movieId") String movieId) {
-        return Collections.singletonList(new CatalogItem("Transformer", "Alien Robot movie", 7.5));
+
+        // Step 1 : Get all rated movie data
+
+        // Step 2 : For each movieId, call the movie-info-service and get details
+
+        // Step 3 : Put them all together and return
+        return
     }
 
 }
