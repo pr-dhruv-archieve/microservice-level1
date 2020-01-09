@@ -3,14 +3,16 @@ package com.maso.movieinfoservice.model;
 public class Movie {
     private String movieId;
     private String movieName;
+    private String movieDescription;
 
     public Movie() {
         super();
     }
 
-    public Movie(String movieId, String movieName) {
+    public Movie(String movieId, String movieName, String movieDescription) {
         this.movieId = movieId;
         this.movieName = movieName;
+        this.movieDescription = movieDescription;
     }
 
     public String getMovieId() {
@@ -27,5 +29,13 @@ public class Movie {
 
     public void setMovieName(String movieName) {
         this.movieName = movieName;
+    }
+
+    public String getMovieDescription() {
+        return movieDescription;
+    }
+
+    public void setMovieDescription(String movieDescription) {
+        this.movieDescription = movieDescription;
     }
 }
