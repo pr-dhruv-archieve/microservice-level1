@@ -1,8 +1,6 @@
 package com.maso.moviecatalogservice.service;
 
-import com.maso.moviecatalogservice.model.CatalogItem;
-import com.maso.moviecatalogservice.model.Movie;
-import com.maso.moviecatalogservice.model.Rating;
+import com.maso.moviecatalogservice.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -16,12 +14,10 @@ import java.util.stream.Collectors;
 public class CatalogService {
 
     @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
     private WebClient.Builder webClientBuilder;
 
-    List<String> requestedMovieId = Arrays.asList(new String("1"), new String("2"), new String("3"), new String("4"), new String("5"));
+    private List<String> requestedMovieId = Arrays.asList(new String("1"), new String("2"), new String("3"), new String("4"), new String("5"));
+    private List<String> requestedMovieIdFromMovieDB = Arrays.asList(new String[]{"101", "102", "103", "104", "105", "106", "107", "108", "109", "110"});
 
     public List<CatalogItem> getAllMovies() {
         /** Step 1 : Get all rated movie data
@@ -75,11 +71,33 @@ public class CatalogService {
                 .retrieve()
                 .bodyToMono(Rating.class)
                 .block();
-        if(movie.getMovieId() == null) {
+        if (movie.getMovieId() == null) {
             CatalogItem catalogItem = new CatalogItem();
             catalogItem.setMovieRating(-1);
             return catalogItem;
         }
         return new CatalogItem(movie.getMovieId(), movie.getMovieName(), movie.getMovieDescription(), rating.getRating());
+    }
+
+    public List<CatalogItem> getAllMoviesFromMovieDB() {
+        return requestedMovieIdFromMovieDB.stream()
+                .map(movieId -> getMovieByIdFromMovieDB(movieId))
+                .collect(Collectors.toList());
+    }
+
+    public CatalogItem getMovieByIdFromMovieDB(String movieId) {
+        TheMovieDBInfo movie = webClientBuilder.build()
+                .get()
+                .uri("http://movie-info-service/movie/theMovieDB/" + movieId)
+                .retrieve()
+                .bodyToMono(TheMovieDBInfo.class)
+                .block();
+        TheMovieDBRating rating = webClientBuilder.build()
+                .get()
+                .uri("http://rating-data-service/rating/theMovieDB/" + movieId)
+                .retrieve()
+                .bodyToMono(TheMovieDBRating.class)
+                .block();
+        return new CatalogItem(movie.getId() + "", movie.getOriginal_title(), movie.getOverview(), rating.getVote_average());
     }
 }

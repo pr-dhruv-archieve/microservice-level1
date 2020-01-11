@@ -36,4 +36,13 @@ public class MovieCatalogController {
         return catalogService.getMovieById(movieId);
     }
 
+    @RequestMapping("/theMovieDB/all")
+    public List<CatalogItem> getAllMoviesFromMovieDB() {
+        return catalogService.getAllMoviesFromMovieDB();
+    }
+
+    @RequestMapping("/theMovieDB/{movieId}")
+    public CatalogItem getMovieByIdFromMovieDB(@PathVariable("movieId") String movieId) {
+        return catalogService.getMovieByIdFromMovieDB(movieId);
+    }
 }
