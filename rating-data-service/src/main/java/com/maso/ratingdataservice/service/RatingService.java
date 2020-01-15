@@ -5,6 +5,7 @@ import com.maso.ratingdataservice.model.TheMovieDBRating;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.swing.text.html.Option;
@@ -18,6 +19,9 @@ public class RatingService {
 
     @Value("${api.key}")
     private String apiKey;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Autowired
     private WebClient.Builder webClientBuilder;
@@ -44,6 +48,14 @@ public class RatingService {
     }
 
     public List<TheMovieDBRating> getAllRatedMovieFromMovieDB() {
+
+        // Using Synchronous calls
+        return movieIds.stream()
+                .map(movieId -> {
+                    return restTemplate.getForObject("https://api.themoviedb.org/3/movie/" + movieId + "?api_key=" + apiKey, TheMovieDBRating.class);
+                }).collect(Collectors.toList());
+
+        /* Using Asynchronous calls
         return movieIds.stream()
                 .map(movieId -> {
                     TheMovieDBRating movieDBRating = webClientBuilder.build()
@@ -53,10 +65,19 @@ public class RatingService {
                             .bodyToMono(TheMovieDBRating.class)
                             .block();
                     return movieDBRating;
-                }).collect(Collectors.toList());
+                }).collect(Collectors.toList());    */
     }
 
     public TheMovieDBRating getRatedMovieByIdFromMovieDB(String inputMovieID) {
+
+        // Using Synchronus calls
+        TheMovieDBRating movieDBRating = restTemplate.getForObject("https://api.themoviedb.org/3/movie/" + inputMovieID + "?api_key=" + apiKey, TheMovieDBRating.class);
+        if(movieDBRating == null)
+            return null;
+        else
+            return movieDBRating;
+
+        /* Using Asynchronous call
         Optional<TheMovieDBRating> movie = movieIds.stream()
                 .filter(id -> id.equalsIgnoreCase(inputMovieID))
                 .map(id -> {
@@ -70,6 +91,8 @@ public class RatingService {
                 .findFirst();
 
         return movie.orElse(null);
+
+         */
     }
 
 }

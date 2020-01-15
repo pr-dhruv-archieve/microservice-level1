@@ -5,6 +5,7 @@ import com.maso.movieinfoservice.model.TheMovieDBInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Arrays;
@@ -17,6 +18,9 @@ public class MovieInfoService {
 
     @Value("${api.key}")
     private String apiKey;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Autowired
     private WebClient.Builder webClientBuilder;
@@ -42,6 +46,13 @@ public class MovieInfoService {
     }
 
     public List<TheMovieDBInfo> getMovieFromMovieDB() {
+        // Using Synchronous calls
+        return movieIds.stream()
+                .map(movieId -> {
+                    return restTemplate.getForObject("https://api.themoviedb.org/3/movie/" + movieId + "?api_key=" + apiKey, TheMovieDBInfo.class);
+                }).collect(Collectors.toList());
+
+        /* using asynchronous calls
         return movieIds.stream()
                 .map(movieId -> {
                     TheMovieDBInfo movieDBRating = webClientBuilder.build()
@@ -51,10 +62,21 @@ public class MovieInfoService {
                             .bodyToMono(TheMovieDBInfo.class)
                             .block();
                     return movieDBRating;
-                }).collect(Collectors.toList());
+                }).collect(Collectors.toList());    */
     }
 
     public TheMovieDBInfo getMovieByIdFromMovieDB(String inputMovieID) {
+
+        // Using Synchronous calls
+        Optional<TheMovieDBInfo> movieDBInfo = movieIds.stream()
+                .filter(id -> id.equalsIgnoreCase(inputMovieID))
+                .map(id -> {
+                    return restTemplate.getForObject("https://api.themoviedb.org/3/movie/" + id + "?api_key=" + apiKey, TheMovieDBInfo.class);
+                }).findFirst();
+        return movieDBInfo.orElse(null);
+
+
+        /* Using Asynchronous calls
         Optional<TheMovieDBInfo> movie = movieIds.stream()
                 .filter(id -> id.equalsIgnoreCase(inputMovieID))
                 .map(id -> {
@@ -67,7 +89,7 @@ public class MovieInfoService {
                 })
                 .findFirst();
 
-        return movie.orElse(null);
+        return movie.orElse(null);  */
     }
 
 }

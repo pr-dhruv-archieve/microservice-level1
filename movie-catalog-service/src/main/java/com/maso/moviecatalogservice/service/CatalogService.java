@@ -1,6 +1,8 @@
 package com.maso.moviecatalogservice.service;
 
 import com.maso.moviecatalogservice.model.*;
+import com.netflix.discovery.converters.Auto;
+import jdk.jfr.Unsigned;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -12,6 +14,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class CatalogService {
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Autowired
     private WebClient.Builder webClientBuilder;
@@ -28,7 +33,7 @@ public class CatalogService {
 /*        movieRatings.stream().map(
                 rating -> {
                     // Making synchronous call to movie-info-service microservice
-                    Movie movie = restTemplate.getForObject("http://localhost:8082/movies/" + rating.getMovieId()  , Movie.class);
+                    Movie movie = restTemplate.getForObject("http://movie-info-service/movie/" + rating.getMovieId()  , Movie.class);
                     return new CatalogItem(rating.getMovieId(), movie.getMovieName(), "Movie id " + rating.getMovieId() + " desc", rating.getRating());
                 }
         ).collect(Collectors.toList()); */
@@ -86,6 +91,11 @@ public class CatalogService {
     }
 
     public CatalogItem getMovieByIdFromMovieDB(String movieId) {
+
+        //Using synchronous calls
+        TheMovieDBInfo movie = restTemplate.getForObject("http://movie-info-service/movie/theMovieDB/" + movieId, TheMovieDBInfo.class);
+        TheMovieDBRating rating = restTemplate.getForObject("http://rating-data-service/rating/theMovieDB/" + movieId, TheMovieDBRating.class);
+        /* Using asynchronous calls
         TheMovieDBInfo movie = webClientBuilder.build()
                 .get()
                 .uri("http://movie-info-service/movie/theMovieDB/" + movieId)
@@ -98,6 +108,7 @@ public class CatalogService {
                 .retrieve()
                 .bodyToMono(TheMovieDBRating.class)
                 .block();
+                */
         return new CatalogItem(movie.getId() + "", movie.getOriginal_title(), movie.getOverview(), rating.getVote_average());
     }
 }
