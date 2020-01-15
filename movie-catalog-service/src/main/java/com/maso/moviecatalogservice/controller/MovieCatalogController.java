@@ -4,6 +4,7 @@ import com.maso.moviecatalogservice.model.CatalogItem;
 import com.maso.moviecatalogservice.model.Movie;
 import com.maso.moviecatalogservice.model.Rating;
 import com.maso.moviecatalogservice.service.CatalogService;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,11 +28,13 @@ public class MovieCatalogController {
      * @return
      */
     @RequestMapping("/all")
+    @HystrixCommand
     public List<CatalogItem> getAllMovies() {
         return catalogService.getAllMovies();
     }
 
     @RequestMapping("/{movieId}")
+    @HystrixCommand
     public CatalogItem getMovieById(@PathVariable("movieId") String movieId) {
         return catalogService.getMovieById(movieId);
     }

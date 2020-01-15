@@ -92,7 +92,7 @@ public class CatalogService {
 
     public CatalogItem getMovieByIdFromMovieDB(String movieId) {
 
-        //Using synchronous calls
+        //Using synchronous  calls
         TheMovieDBInfo movie = restTemplate.getForObject("http://movie-info-service/movie/theMovieDB/" + movieId, TheMovieDBInfo.class);
         TheMovieDBRating rating = restTemplate.getForObject("http://rating-data-service/rating/theMovieDB/" + movieId, TheMovieDBRating.class);
         /* Using asynchronous calls
