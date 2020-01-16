@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,15 +29,25 @@ public class MovieCatalogController {
      * @return
      */
     @RequestMapping("/all")
-    @HystrixCommand
+    @HystrixCommand(fallbackMethod = "getFallBackCatalogAllMovie")
     public List<CatalogItem> getAllMovies() {
         return catalogService.getAllMovies();
     }
 
+    public List<CatalogItem> getFallBackCatalogAllMovie() {
+        return Arrays.asList(
+                new CatalogItem(null, null, null, 0)
+        );
+    }
+
     @RequestMapping("/{movieId}")
-    @HystrixCommand
+    @HystrixCommand(fallbackMethod = "getFallBackCatalogForMovieId")
     public CatalogItem getMovieById(@PathVariable("movieId") String movieId) {
         return catalogService.getMovieById(movieId);
+    }
+
+    public CatalogItem getFallBackCatalogForMovieId(@PathVariable("movieId") String movieId) {
+        return new CatalogItem(null, null, null, -1);
     }
 
     @RequestMapping("/theMovieDB/all")

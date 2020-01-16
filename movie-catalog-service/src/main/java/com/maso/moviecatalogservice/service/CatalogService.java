@@ -1,8 +1,6 @@
 package com.maso.moviecatalogservice.service;
 
 import com.maso.moviecatalogservice.model.*;
-import com.netflix.discovery.converters.Auto;
-import jdk.jfr.Unsigned;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
